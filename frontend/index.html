@@ -33,7 +33,7 @@
         <form id="formCsv" action="/upload" method="post" enctype="multipart/form-data">
           <div class="row mb-2">
             <div class="col-md-10">
-              <input type="file" id="csvFileInput" class="form-control">
+              <input type="file" id="csvFileInput" class="form-control" accept=".csv">
             </div>
             <div class="col-md-2">
               <button id="submission" class="btn btn-primary w-100">Submit</button>
@@ -68,38 +68,34 @@
   <script src="bootstrap.bundle.min.js"></script>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      refreshTable();
+    });
+
     document.getElementById('formCsv').addEventListener('submit', function (event) {
       event.preventDefault();
 
       const file = document.getElementById("csvFileInput").files[0];
-
-      // Parse the CSV
       const reader = new FileReader();
       reader.readAsText(file);
 
       reader.onload = function (event) {
-        const csv = event.target.result; // the loaded CSV content
-        displayData(parseCSV(csv));
+        const csv = event.target.result; 
+        fetch('http://localhost:8080/books', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/csv'
+          },
+          body: csv
+        }).then(response => {
+          if (response.ok) {
+            return refreshTable();
+          }
+          throw new Error('Network response was not ok.');
+        }).catch(error => {
+          console.error(error);
+        });
       };
-
-      // const formData = new FormData(this);
-
-      // fetch('/upload', {
-      //     method: 'POST',
-      //     body: formData
-      //   })
-      //   .then(response => {
-      //     if (response.ok) {
-      //       return response.text();
-      //     }
-      //     throw new Error('Network response was not ok.');
-      //   })
-      //   .then(data => {
-      //     console.log(data);
-      //   })
-      //   .catch(error => {
-      //     console.error(error);
-      //   });
     });
 
     document.getElementById("searchInput").addEventListener("keyup", function () {
@@ -112,6 +108,28 @@
         row.style.display = matched ? "" : "none";
       });
     });
+
+    function refreshTable() {
+      return fetchBooks().then(data => {
+        displayData(data);
+      });
+    }
+
+    function fetchBooks() {
+      return fetch('http://localhost:8080/books')
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+          return data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
 
     function parseCSV(text) {
       let lines = text.split("\n");
@@ -129,7 +147,13 @@
         }
       }
 
-      return result;
+      return result.map(item => ({
+        isbn: item.isbn,
+        title: item.title,
+        author: item.author,
+        price: item.price,
+        releaseDate: item.release_date
+      }));
     }
 
     function parseLine(line) {
@@ -164,12 +188,13 @@
 
       data.forEach(item => {
         const row = document.createElement("tr");
+        const formattedPrice = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.price);
         row.innerHTML = `
                 <td>${item.isbn}</td>
                 <td>${item.title}</td>
                 <td>${item.author}</td>
-                <td>${item.price}</td>
-                <td>${item.release_date}</td>
+                <td>${formattedPrice}</td>
+                <td>${item.releaseDate}</td>
             `;
         tbody.appendChild(row);
       });
