@@ -14,5 +14,9 @@
     <orderEntry type="library" name="de.siegmar.fastcsv" level="project" />
     <orderEntry type="library" name="mysql.connector.j" level="project" />
     <orderEntry type="library" name="ch.qos.logback.classic" level="project" />
+    <orderEntry type="library" name="keycloak.core" level="project" />
+    <orderEntry type="library" name="io.jsonwebtoken.jjwt" level="project" />
+    <orderEntry type="library" name="glassfish.jaxb.runtime" level="project" />
+    <orderEntry type="library" name="javax.xml.bind.jaxb.api" level="project" />
   </component>
 </module>

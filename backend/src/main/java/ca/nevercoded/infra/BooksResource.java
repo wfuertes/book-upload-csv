@@ -16,7 +16,8 @@ public class BooksResource {
         Gson gson = GsonFactory.create();
         final var getBooks = new GetBooksHandler(new NotFoundHandler(), gson, bookService);
         final var postBooks = new PostBooksHandler(getBooks, bookService);
-        final var options = new OptionsHandler(postBooks);
+        final var tokenValidation = new TokenValidationHandler(postBooks, GsonFactory.create());
+        final var options = new OptionsHandler(tokenValidation);
         final var cors = new CorsHandler(options);
         final var errorHandler = new ErrorHandler(cors);
         return errorHandler;

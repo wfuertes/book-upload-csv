@@ -18,12 +18,12 @@
           <span class="fs-4">BookStore Portal</span>
         </a>
 
-        <!-- <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Features</a>
+        <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+          <!-- <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Features</a>
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Enterprise</a>
-          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Support</a>
-          <a class="py-2 link-body-emphasis text-decoration-none" href="#">Pricing</a>
-        </nav> -->
+          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Support</a> -->
+          <a id="logout" class="py-2 link-body-emphasis text-decoration-none" href="#">Logout</a>
+        </nav>
       </div>
     </header>
 
@@ -66,138 +66,181 @@
     </main>
   </div>
   <script src="bootstrap.bundle.min.js"></script>
+  <script src="keycloak.min.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      refreshTable();
-    });
-
-    document.getElementById('formCsv').addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      const file = document.getElementById("csvFileInput").files[0];
-      const reader = new FileReader();
-      reader.readAsText(file);
-
-      reader.onload = function (event) {
-        const csv = event.target.result; 
-        fetch('http://localhost:8080/books', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/csv'
-          },
-          body: csv
-        }).then(response => {
-          if (response.ok) {
-            return refreshTable();
-          }
-          throw new Error('Network response was not ok.');
-        }).catch(error => {
-          console.error(error);
-        });
+    main();
+    async function main() {
+      const keycloakConfig = {
+        url: 'http://localhost:8092',
+        realm: 'NeverCoded',
+        clientId: 'book-upload-csv'
       };
-    });
 
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-      let input = this.value.toLowerCase();
-      let rows = document.querySelectorAll("#booksTable tbody tr");
+      const keycloak = new Keycloak(keycloakConfig);
 
-      rows.forEach(row => {
-        let columns = row.querySelectorAll("td");
-        let matched = Array.from(columns).some(column => column.textContent.toLowerCase().includes(input));
-        row.style.display = matched ? "" : "none";
+      try {
+        const authenticated = await keycloak.init({ onLoad: 'login-required' });
+        if (authenticated) {
+          console.log("Authenticated Successfully" + keycloak.token);
+          // App initialization here
+          await refreshTable();
+        } else {
+          console.log("Failed to authenticate");
+        }
+      } catch (error) {
+        console.error("Initialization Error:", error);
+      }
+
+      document.getElementById('logout').addEventListener('click', function (event) {
+        event.preventDefault();
+        keycloak.logout();
       });
-    });
 
-    function refreshTable() {
-      return fetchBooks().then(data => {
-        displayData(data);
-      });
-    }
-
-    function fetchBooks() {
-      return fetch('http://localhost:8080/books')
-        .then(response => {
-          if (response.ok) {
-            return response.json();
+      setInterval(() => {
+        keycloak.updateToken(70).then(refreshed => {
+          if (refreshed) {
+            console.log('Token refreshed');
+          } else {
+            console.log('Token not refreshed, valid for', Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000), 'seconds');
           }
-          throw new Error('Network response was not ok.');
-        })
-        .then(data => {
-          return data;
-        })
-        .catch(error => {
-          console.error(error);
+        }).catch(err => {
+          console.error('Failed to refresh token', err);
         });
-    }
+      }, 60000);
 
-    function parseCSV(text) {
-      let lines = text.split("\n");
-      let result = [];
-      let headers = parseLine(lines[0]);
+      document.getElementById('formCsv').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-      for (let i = 1; i < lines.length; i++) {
-        let currentLineData = parseLine(lines[i]);
-        if (currentLineData.length === headers.length) {
-          let obj = {};
-          for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLineData[j];
-          }
-          result.push(obj);
-        }
-      }
+        const file = document.getElementById("csvFileInput").files[0];
+        const reader = new FileReader();
+        reader.readAsText(file);
 
-      return result.map(item => ({
-        isbn: item.isbn,
-        title: item.title,
-        author: item.author,
-        price: item.price,
-        releaseDate: item.release_date
-      }));
-    }
-
-    function parseLine(line) {
-      let insideQuote = false;
-      let tokens = [''];
-      let i = 0;
-
-      for (let c of line) {
-        switch (c) {
-          case ',':
-            if (insideQuote) {
-              tokens[i] += c;
-            } else {
-              tokens[++i] = '';
+        reader.onload = function (event) {
+          const csv = event.target.result;
+          fetch('http://localhost:8080/books', {
+            method: 'POST',
+            headers: {
+              "Authorization": "Bearer " + keycloak.token,
+              'Content-Type': 'text/csv'
+            },
+            body: csv
+          }).then(response => {
+            if (response.ok) {
+              return refreshTable();
             }
-            break;
-          case '"':
-            insideQuote = !insideQuote;
-            break;
-          default:
-            tokens[i] += c;
-        }
+            throw new Error('Network response was not ok.');
+          }).catch(error => {
+            console.error(error);
+          });
+        };
+      });
+
+      document.getElementById("searchInput").addEventListener("keyup", function () {
+        let input = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#booksTable tbody tr");
+
+        rows.forEach(row => {
+          let columns = row.querySelectorAll("td");
+          let matched = Array.from(columns).some(column => column.textContent.toLowerCase().includes(input));
+          row.style.display = matched ? "" : "none";
+        });
+      });
+
+      async function refreshTable() {
+        return fetchBooks().then(data => {
+          displayData(data);
+        });
       }
 
-      return tokens;
-    }
+      function fetchBooks() {
+        return fetch('http://localhost:8080/books', {
+          headers: {
+            Authorization: "Bearer " + keycloak.token
+          }
+        })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          })
+          .then(data => {
+            return data;
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+
+      function parseCSV(text) {
+        let lines = text.split("\n");
+        let result = [];
+        let headers = parseLine(lines[0]);
+
+        for (let i = 1; i < lines.length; i++) {
+          let currentLineData = parseLine(lines[i]);
+          if (currentLineData.length === headers.length) {
+            let obj = {};
+            for (let j = 0; j < headers.length; j++) {
+              obj[headers[j]] = currentLineData[j];
+            }
+            result.push(obj);
+          }
+        }
+
+        return result.map(item => ({
+          isbn: item.isbn,
+          title: item.title,
+          author: item.author,
+          price: item.price,
+          releaseDate: item.release_date
+        }));
+      }
+
+      function parseLine(line) {
+        let insideQuote = false;
+        let tokens = [''];
+        let i = 0;
+
+        for (let c of line) {
+          switch (c) {
+            case ',':
+              if (insideQuote) {
+                tokens[i] += c;
+              } else {
+                tokens[++i] = '';
+              }
+              break;
+            case '"':
+              insideQuote = !insideQuote;
+              break;
+            default:
+              tokens[i] += c;
+          }
+        }
+
+        return tokens;
+      }
 
 
-    function displayData(data) {
-      const tbody = document.querySelector("#booksTable tbody");
-      tbody.innerHTML = ''; // Clear previous data
+      function displayData(data) {
+        const tbody = document.querySelector("#booksTable tbody");
+        tbody.innerHTML = ''; // Clear previous data
 
-      data.forEach(item => {
-        const row = document.createElement("tr");
-        const formattedPrice = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.price);
-        row.innerHTML = `
+        data.forEach(item => {
+          const row = document.createElement("tr");
+          const formattedPrice = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.price);
+          row.innerHTML = `
                 <td>${item.isbn}</td>
                 <td>${item.title}</td>
                 <td>${item.author}</td>
                 <td>${formattedPrice}</td>
                 <td>${item.releaseDate}</td>
             `;
-        tbody.appendChild(row);
-      });
+          tbody.appendChild(row);
+        });
+      }
     }
   </script>
 
