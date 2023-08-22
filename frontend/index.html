@@ -223,10 +223,17 @@
         return tokens;
       }
 
-
       function displayData(data) {
         const tbody = document.querySelector("#booksTable tbody");
+
         tbody.innerHTML = ''; // Clear previous data
+        if (data == null || data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5"> There is no book stored yet!</th>
+            </tr>
+        `; 
+        }
 
         data.forEach(item => {
           const row = document.createElement("tr");
