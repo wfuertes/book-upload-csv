@@ -18,5 +18,6 @@
     <orderEntry type="library" name="io.jsonwebtoken.jjwt" level="project" />
     <orderEntry type="library" name="glassfish.jaxb.runtime" level="project" />
     <orderEntry type="library" name="javax.xml.bind.jaxb.api" level="project" />
+    <orderEntry type="library" name="de.siegmar.logback.gelf" level="project" />
   </component>
 </module>

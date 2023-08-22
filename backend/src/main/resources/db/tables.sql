@@ -1,3 +1,8 @@
+-- bookstore
+CREATE database bookstore;
+
+use bookstore;
+
 -- bookstore.books definition
 CREATE TABLE books (
   isbn varchar(13) NOT NULL,

@@ -67,6 +67,7 @@ public class MySqlBookRepository implements BookRepository {
                     query.setString(2, book.title());
                     query.setString(3, book.author());
                     query.setDate(4, Date.valueOf(book.releaseDate()));
+                    query.addBatch();
                     query.execute();
                 }
             }
