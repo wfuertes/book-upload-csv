@@ -1,4 +1,4 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.core;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

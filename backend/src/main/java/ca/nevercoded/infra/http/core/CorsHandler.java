@@ -1,4 +1,4 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.core;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -9,7 +9,7 @@ public class CorsHandler implements HttpHandler {
 
     private final HttpHandler next;
 
-    CorsHandler(HttpHandler next) {
+    public CorsHandler(HttpHandler next) {
         this.next = next;
     }
 

@@ -1,6 +1,6 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.books;
 
-import ca.nevercoded.books.BookService;
+import ca.nevercoded.domain.books.BookService;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

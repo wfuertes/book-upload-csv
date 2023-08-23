@@ -1,7 +1,7 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.books;
 
-import ca.nevercoded.books.Book;
-import ca.nevercoded.books.BookService;
+import ca.nevercoded.domain.books.Book;
+import ca.nevercoded.domain.books.BookService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import de.siegmar.fastcsv.reader.NamedCsvReader;

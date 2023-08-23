@@ -1,4 +1,4 @@
-package ca.nevercoded.books;
+package ca.nevercoded.domain.books;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

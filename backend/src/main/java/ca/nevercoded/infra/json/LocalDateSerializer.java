@@ -1,4 +1,4 @@
-package ca.nevercoded.infra.config;
+package ca.nevercoded.infra.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;

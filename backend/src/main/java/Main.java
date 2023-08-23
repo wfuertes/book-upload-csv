@@ -1,4 +1,4 @@
-import ca.nevercoded.infra.BooksResource;
+import ca.nevercoded.infra.http.books.BooksResource;
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

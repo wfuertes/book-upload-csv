@@ -1,4 +1,4 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.core;
 
 import ca.nevercoded.infra.keycloack.KeycloakGateway;
 import com.sun.net.httpserver.HttpExchange;

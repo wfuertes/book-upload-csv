@@ -1,10 +1,11 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.books;
 
-import ca.nevercoded.books.BookRepository;
-import ca.nevercoded.books.BookService;
-import ca.nevercoded.infra.config.DataSourceFactory;
-import ca.nevercoded.infra.config.GsonFactory;
-import ca.nevercoded.infra.data.MySqlBookRepository;
+import ca.nevercoded.domain.books.BookRepository;
+import ca.nevercoded.domain.books.BookService;
+import ca.nevercoded.infra.http.core.*;
+import ca.nevercoded.infra.sql.DataSourceFactory;
+import ca.nevercoded.infra.json.GsonFactory;
+import ca.nevercoded.infra.sql.MySqlBookRepository;
 import ca.nevercoded.infra.keycloack.KeycloakGateway;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,4 +1,4 @@
-package ca.nevercoded.infra;
+package ca.nevercoded.infra.http.core;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -14,7 +14,7 @@ public class ErrorHandler implements HttpHandler {
 
     private final HttpHandler next;
 
-    ErrorHandler(HttpHandler next) {
+    public ErrorHandler(HttpHandler next) {
         this.next = next;
     }
 

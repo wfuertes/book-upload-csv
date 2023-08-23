@@ -1,7 +1,7 @@
-package ca.nevercoded.infra.data;
+package ca.nevercoded.infra.sql;
 
-import ca.nevercoded.books.Book;
-import ca.nevercoded.books.BookRepository;
+import ca.nevercoded.domain.books.Book;
+import ca.nevercoded.domain.books.BookRepository;
 
 import javax.sql.DataSource;
 import java.sql.Date;

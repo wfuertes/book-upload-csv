@@ -1,4 +1,4 @@
-package ca.nevercoded.books;
+package ca.nevercoded.domain.books;
 
 import java.util.Collection;
 import java.util.List;

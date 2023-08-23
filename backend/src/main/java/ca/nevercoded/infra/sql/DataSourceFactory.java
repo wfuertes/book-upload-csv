@@ -1,4 +1,4 @@
-package ca.nevercoded.infra.config;
+package ca.nevercoded.infra.sql;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 
